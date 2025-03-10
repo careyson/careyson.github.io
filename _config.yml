@@ -23,16 +23,38 @@ email: careyson@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   宋沄剑的技术博客
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://careyson.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: 
 github_username:  careyson
 
 
 # theme: jekyll-theme-chirpy
-remote_theme: cotes2020/jekyll-theme-chirpy
+# Build settings
+theme: jekyll-theme-chirpy
+
+# Chirpy 主题设置
+timezone: Asia/Shanghai  # 调整为你的时区
+lang: zh-CN  # 设置为中文
+
+paginate: 10
+kramdown:
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: highlight
+    span:
+      line_numbers: false
+    block:
+      line_numbers: true
+      start_line: 1
+
+# 插件
 plugins:
   - jekyll-feed
-  - jekyll-remote-theme  
+  - jekyll-sitemap
+  - jekyll-paginate
+  - jekyll-seo-tag
+  - jekyll-archives
+  - jekyll-redirect-from
 
 # Exclude from processing.
 # The following items will not be processed, by default.

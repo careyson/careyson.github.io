@@ -28,12 +28,11 @@ twitter_username:
 github_username:  careyson
 
 
-theme: jekyll-theme-chirpy
+# theme: jekyll-theme-chirpy
+remote_theme: cotes2020/jekyll-theme-chirpy
 plugins:
   - jekyll-feed
-  - jekyll-paginate
-  - jekyll-seo-tag
-  - jekyll-sitemap
+  - jekyll-remote-theme  
 
 # Exclude from processing.
 # The following items will not be processed, by default.

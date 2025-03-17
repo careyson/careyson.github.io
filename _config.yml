@@ -10,8 +10,8 @@ title: "我的简洁酷炫博客"
 subtitle: "思考与创造"
 name: "你的名字"
 description: "个人博客和项目展示"
-url: "https://username.github.io" # 替换为你的GitHub Pages URL
-repository: "username/username.github.io" # 替换为你的仓库名
+url: "https://careyson.github.io" # 替换为你的GitHub Pages URL
+repository: "careyson/careyson.github.io" # 替换为你的仓库名
 
 # 页面布局设置
 permalink: /:categories/:title/
@@ -28,20 +28,20 @@ author:
   links:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      url: "https://github.com/username"
+      url: "https://github.com/careyson"
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
-      url: "https://twitter.com/username"
+      url: "https://twitter.com/careyson"
 
 # 页脚链接
 footer:
   links:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      url: "https://github.com/username"
+      url: "https://github.com/careyson"
     - label: "Twitter"
       icon: "fab fa-fw fa-twitter-square"
-      url: "https://twitter.com/username"
+      url: "https://twitter.com/careyson"
 
 # 默认布局设置
 defaults:

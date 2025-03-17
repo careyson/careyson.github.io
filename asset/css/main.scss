@@ -1,0 +1,109 @@
+/* 添加到 /assets/css/main.scss 文件中 */
+
+---
+# 只有前置内容
+---
+
+@import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // 皮肤
+@import "minimal-mistakes"; // 主要样式
+
+/* 自定义样式开始 */
+
+// 标题渐变色效果
+.page__title {
+  background: linear-gradient(45deg, #4776E6, #8E54E9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+// 导航栏半透明效果
+.masthead {
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+// 按钮悬停动画
+.btn {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+// 文章卡片悬停效果
+.archive__item {
+  transition: all 0.3s ease;
+}
+
+.archive__item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+// 代码块样式优化
+.highlight {
+  border-radius: 10px;
+  margin: 2em 0;
+}
+
+.language-plaintext {
+  color: #e83e8c;
+  background-color: rgba(232, 62, 140, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+}
+
+// 图片悬停效果
+.page__content img {
+  transition: all 0.3s ease;
+}
+
+.page__content img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+// 滚动条美化
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+// 文字选中效果
+::selection {
+  background: rgba(142, 84, 233, 0.3);
+  color: #fff;
+}
+
+// 页面加载动画
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.page {
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+// 响应式优化
+@media (max-width: 768px) {
+  .page__title {
+    font-size: 1.8em;
+  }
+}

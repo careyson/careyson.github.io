@@ -1,77 +1,89 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that. If you find
-# yourself editing this file very often, consider using Jekyll's data files
-# feature for the data you need to update frequently.
-#
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
-#
-# If you need help with YAML syntax, here are some quick references for you:
-# https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
-# https://learnxinyminutes.com/docs/yaml/
-#
-# Site settings
-# These are used to personalize your new site. If you look in the HTML files,
-# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
-# You can create any custom variable you would like, and they will be accessible
-# in the templates via {{ site.myvariable }}.
+# _config.yml 文件内容
 
-title: 宋沄剑的博客
-email: careyson@gmail.com
-description: >- # this means to ignore newlines until "baseurl:"
-  宋沄剑的技术博客
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://careyson.github.io" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: 
-github_username:  careyson
+# 主题设置
+remote_theme: "mmistakes/minimal-mistakes@4.24.0"
+minimal_mistakes_skin: "dark" # 可选: default, air, aqua, contrast, dark, dirt, neon, mint, plum, sunrise
 
+# 站点设置
+locale: "zh-CN"
+title: "我的简洁酷炫博客"
+subtitle: "思考与创造"
+name: "你的名字"
+description: "个人博客和项目展示"
+url: "https://username.github.io" # 替换为你的GitHub Pages URL
+repository: "username/username.github.io" # 替换为你的仓库名
 
-# theme: jekyll-theme-chirpy
-# Build settings
-theme: jekyll-theme-chirpy
+# 页面布局设置
+permalink: /:categories/:title/
+paginate: 5
+paginate_path: /page:num/
+search: true
 
-# Chirpy 主题设置
-timezone: Asia/Shanghai  # 调整为你的时区
-lang: zh-CN  # 设置为中文
+# 社交链接
+author:
+  name: "你的名字"
+  avatar: "/assets/images/bio-photo.jpg"
+  bio: "简短的个人介绍"
+  location: "所在地"
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/username"
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter-square"
+      url: "https://twitter.com/username"
 
-paginate: 10
-kramdown:
-  syntax_highlighter: rouge
-  syntax_highlighter_opts:
-    css_class: highlight
-    span:
-      line_numbers: false
-    block:
-      line_numbers: true
-      start_line: 1
+# 页脚链接
+footer:
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/username"
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter-square"
+      url: "https://twitter.com/username"
+
+# 默认布局设置
+defaults:
+  # _posts
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: single
+      author_profile: true
+      read_time: true
+      comments: true
+      share: true
+      related: true
+      show_date: true
+  # _pages
+  - scope:
+      path: "_pages"
+      type: pages
+    values:
+      layout: single
+      author_profile: true
 
 # 插件
 plugins:
-  - jekyll-feed
-  - jekyll-sitemap
   - jekyll-paginate
+  - jekyll-sitemap
+  - jekyll-gist
+  - jekyll-feed
+  - jekyll-include-cache
   - jekyll-seo-tag
-  - jekyll-archives
-  - jekyll-redirect-from
 
-# Exclude from processing.
-# The following items will not be processed, by default.
-# Any item listed under the `exclude:` key here will be automatically added to
-# the internal "default list".
-#
-# Excluded items can be processed by explicitly listing the directories or
-# their entries' file path in the `include:` list.
-#
-# exclude:
-#   - .sass-cache/
-#   - .jekyll-cache/
-#   - gemfiles/
-#   - Gemfile
-#   - Gemfile.lock
-#   - node_modules/
-#   - vendor/bundle/
-#   - vendor/cache/
-#   - vendor/gems/
-#   - vendor/ruby/
+# 归档设置
+category_archive:
+  type: liquid
+  path: /categories/
+tag_archive:
+  type: liquid
+  path: /tags/
+
+# HTML压缩设置
+compress_html:
+  clippings: all
+  ignore:
+    envs: development

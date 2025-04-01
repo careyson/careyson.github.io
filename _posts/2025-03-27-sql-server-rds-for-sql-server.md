@@ -14,7 +14,7 @@ tags: [博客园迁移]
 
 整体的迁移流程如下图所示，从线下迁移到RDS，与将数据库从一台机器迁移到另一台机器的整体流程相似。本文将详细介绍各个迁移阶段的操作步骤。
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100022854-30362134.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100022854-30362134.png)
 
 # 事前准备
 
@@ -28,11 +28,11 @@ tags: [博客园迁移]
 
 RDS新购之后，先将使用数据库的各方应用白名单开放，该步骤可以提前验证。
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100119588-1311150602.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100119588-1311150602.png)
 
 可以在应用侧使用RDS DNS地址测试连接，地址如下所示：
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100133979-664609268.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100133979-664609268.png)
 
 在迁移前，应在应用程序服务器通过telnet RDS实例地址 1433命令确认网络连通性。
 
@@ -40,7 +40,7 @@ RDS新购之后，先将使用数据库的各方应用白名单开放，该步�
 
 可以在RDS控制台，通过“参数管理”设置实例级别的参数，如下图所示。
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100250107-94382977.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100250107-94382977.png)
 
 这两个参数通常值得特别注意：
 
@@ -55,13 +55,13 @@ RDS新购之后，先将使用数据库的各方应用白名单开放，该步�
 
 可以通过Management Studio将作业脚本导出的方式迁移作业，这里注意并不是每一个作业都需要导出，通常一些计划任务，备份相关的作业不再需要导出，RDS已经具备了这些基本的PaaS层能力。
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100304617-1756215461.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100304617-1756215461.png)
 
 # 数据迁移
 
 数据迁移的最佳实践是通过割接时间窗口之外进行全量数据库迁移，在割接窗口仅进行最小化的差异数据割接，整体流程如下：
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100319278-1181870804.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100319278-1181870804.png)
 
 数据迁移流程主要包括：
 
@@ -179,7 +179,7 @@ RDS新购之后，先将使用数据库的各方应用白名单开放，该步�
 
 一次全备+一次差异+两次日志备份，通过时间戳和修改时间能确定先后顺序
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100335655-1822978719.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100335655-1822978719.png)
 
 ## 上传到OSS
 
@@ -191,17 +191,17 @@ RDS新购之后，先将使用数据库的各方应用白名单开放，该步�
 
 将备份上传到OSS之后，还原全量备份可以在事前进行。
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100347317-1229733537.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100347317-1229733537.png)
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100358530-2098501146.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100358530-2098501146.png)
 
 ### 还原增量或差异备份
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100529391-1050865077.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100529391-1050865077.png)
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100550733-1831398723.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100550733-1831398723.png)
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-d3a0f57d-4311-4601-8d18-c815ee6778eb.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-d3a0f57d-4311-4601-8d18-c815ee6778eb.png)
 
 ## 停机等待上线
 
@@ -237,7 +237,7 @@ RDS新购之后，先将使用数据库的各方应用白名单开放，该步�
     CLOSE login_cursor;
     DEALLOCATE login_cursor;
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100606408-1563215715.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100606408-1563215715.png)
 
 禁用所有Login之后，为了避免存在长连接，可以重启原实例的SQL Server。
 
@@ -249,7 +249,7 @@ RDS新购之后，先将使用数据库的各方应用白名单开放，该步�
 
 上线数据库本质是对应restore with recovery步骤，操作界面如图，可以看到一致性选择有两个选项，这里建议选择“一步执行DBCC”。
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100621325-139985446.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100621325-139985446.png)
 
 ## 数据库上线之后
 
@@ -263,13 +263,13 @@ RDS新购之后，先将使用数据库的各方应用白名单开放，该步�
 
 也可以通过阿里云控制台更新统计信息。
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100636133-317759737.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100636133-317759737.png)
 
 ### 使用阿里云DAS确认瓶颈
 
 上线后使用阿里云DAS进行性能监控，及时发现并优化可能存在的性能瓶颈。如图所示，一些明显有问题的语句，可以很容易定位捕获，并进行针对性的调优。
 
-![image](/assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100648306-1259439403.png)
+![image](assets/images/2025-03-27-sql-server-rds-for-sql-server/sql-server-rds-for-sql-server-35368-20250328100648306-1259439403.png)
 
 # 小结
 

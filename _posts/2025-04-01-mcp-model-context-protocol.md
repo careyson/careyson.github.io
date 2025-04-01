@@ -44,7 +44,7 @@ MCP由Anthropic首次提出并开源，通过定义标准化接口，允许大�
 
 
 
-![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-aa97f462-d2bf-4ada-bcb5-6ac22554f07c.png)
+![image](/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-aa97f462-d2bf-4ada-bcb5-6ac22554f07c.png)
 
 正是由于这些痛点，MCP应运而生，提供了一个标准化的、多功能、可扩展的接口，极大简化了LLM与外部系统的深度集成。
 

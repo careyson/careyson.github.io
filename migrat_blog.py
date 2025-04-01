@@ -9,6 +9,8 @@
 3. 下载文章中的图片并保存到本地GitHub仓库的assets目录，每篇文章的图片存放在独立目录
 4. 生成符合GitHub Pages格式的Markdown文件
 5. 支持全量下载或增量更新模式
+6. 支持CDN加速图片链接
+7. 修复文件名，避免URL重名
 """
 
 import os
@@ -66,11 +68,6 @@ class CnblogsToGitHub:
         os.makedirs(self.assets_dir, exist_ok=True)
         os.makedirs(self.data_dir, exist_ok=True)
 
-        # 创建必要的目录
-        os.makedirs(self.post_dir, exist_ok=True)
-        os.makedirs(self.assets_dir, exist_ok=True)
-        os.makedirs(self.data_dir, exist_ok=True)
-
         # 已处理文章的元数据文件
         self.meta_file = os.path.join(self.data_dir, 'processed_articles.json')
 
@@ -89,9 +86,59 @@ class CnblogsToGitHub:
         self.h2t.escape_snob = True
         self.h2t.body_width = 0  # 禁用自动换行
 
-        # 为已经迁移过的网站修正路径（将/assets/改为assets/）
-        if os.path.exists(self.post_dir):
-            self.fix_existing_image_paths()
+    def fix_existing_filenames(self):
+        """
+        修复现有的文件名，添加日期前缀，格式为: yyyy-mm-dd-yyyy-mm-dd-title.md 或 yyyy-mm-dd-yyyy-mm-dd-序号.md
+        """
+        try:
+            logger.info("正在检查并修复已有文章的文件名...")
+            fixed_count = 0
+
+            # 获取所有Markdown文件
+            md_files = [f for f in os.listdir(self.post_dir) if f.endswith('.md')]
+
+            # 按日期分组文件
+            date_files = {}
+            for filename in md_files:
+                # 检查文件名是否符合 yyyy-mm-dd-title.md 格式
+                match = re.match(r'^(\d{4}-\d{2}-\d{2})-(.*?)\.md$', filename)
+                if match:
+                    date = match.group(1)
+                    title = match.group(2)
+
+                    # 检查文件名是否已经包含日期前缀
+                    if re.match(r'^' + date + r'-.*$', title):
+                        logger.info(f"文件名已包含日期前缀，跳过: {filename}")
+                        continue
+
+                    # 将文件按日期分组
+                    if date not in date_files:
+                        date_files[date] = []
+                    date_files[date].append((filename, title))
+
+            # 处理每个日期的文件
+            for date, files in date_files.items():
+                # 为数字序号文件重命名
+                for filename, title in files:
+                    old_path = os.path.join(self.post_dir, filename)
+
+                    # 构建新文件名
+                    if re.match(r'^\d+$', title):  # 仅包含数字的标题（序号）
+                        new_title = f"{date}-{title.zfill(2)}"
+                    else:  # 正常标题
+                        new_title = f"{date}-{title}"
+
+                    new_filename = f"{date}-{new_title}.md"
+                    new_path = os.path.join(self.post_dir, new_filename)
+
+                    # 重命名文件
+                    os.rename(old_path, new_path)
+                    logger.info(f"重命名文件: {filename} -> {new_filename}")
+                    fixed_count += 1
+
+            logger.info(f"完成文件名修复，共修复 {fixed_count} 个文件")
+        except Exception as e:
+            logger.error(f"修复文件名失败: {str(e)}")
 
     def fix_existing_image_paths(self):
         """
@@ -433,6 +480,7 @@ class CnblogsToGitHub:
             safe_title = re.sub(r'[^a-zA-Z0-9\-_]', '-', title.lower())
             safe_title = re.sub(r'-+', '-', safe_title).strip('-')
 
+            # 在文件名中添加日期前缀，格式为: yyyy-mm-dd-yyyy-mm-dd-title.md 或 yyyy-mm-dd-yyyy-mm-dd-序号.md
             # 如果标题为空或只有特殊字符（生成的safe_title为空），则使用序号
             if not safe_title:
                 # 获取当前日期的计数器
@@ -442,7 +490,10 @@ class CnblogsToGitHub:
                     self.file_counter[published_date] += 1
 
                 # 使用两位数序号，例如01, 02, ...
-                safe_title = f"{self.file_counter[published_date]:02d}"
+                safe_title = f"{published_date}-{self.file_counter[published_date]:02d}"
+            else:
+                # 对于有效标题，添加日期前缀
+                safe_title = f"{published_date}-{safe_title}"
 
             filename = f"{published_date}-{safe_title}.md"
             filepath = os.path.join(self.post_dir, filename)
@@ -479,12 +530,16 @@ tags: [博客园迁移]
         if limit and limit < len(article_urls):
             article_urls = article_urls[:limit]
 
-        # 统计信息
+        # 统计信息    
         success_count = 0
         skip_count = 0
         update_count = 0
 
         try:
+            # 首先检查是否需要修复已有文件名（添加日期前缀）
+            if os.path.exists(self.post_dir):
+                self.fix_existing_filenames()
+
             for i, url in enumerate(article_urls):
                 logger.info(f"处理第 {i + 1}/{len(article_urls)} 篇文章: {url}")
 
@@ -559,10 +614,4 @@ def main():
 if __name__ == '__main__':
     main()
 
-
-# 使用 CDN 链接
-#python migrate_blog.py -u careyson -g /path/to/your/local/github/repo -c -gu careyson -gr careyson.github.io
 #python migrat_blog.py -u careyson -g  F:\yunjian.github.io -c -gu careyson -gr careyson.github.io -c --max-pages 1
-
-# 不使用 CDN 链接（普通模式）
-#python migrate_blog.py -u 你的博客园用户名 -g /path/to/your/local/github/repo

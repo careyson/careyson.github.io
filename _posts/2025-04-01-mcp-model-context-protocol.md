@@ -44,7 +44,7 @@ MCP由Anthropic首次提出并开源，通过定义标准化接口，允许大�
 
 
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-aa97f462-d2bf-4ada-bcb5-6ac22554f07c.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-aa97f462-d2bf-4ada-bcb5-6ac22554f07c.png)
 
 正是由于这些痛点，MCP应运而生，提供了一个标准化的、多功能、可扩展的接口，极大简化了LLM与外部系统的深度集成。
 
@@ -65,13 +65,13 @@ MCP采用客户机-服务器（client-server）架构，通过JSON-RPC 2.0协议
 
 典型的架构图如下：
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-31eb5792-f9b4-4afc-a9bf-94d6caff7b59.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-31eb5792-f9b4-4afc-a9bf-94d6caff7b59.png)
 
 # DEMO：构建SQL Server MCP服务器，实现CRM数据分析
 
 我们实现一个简单的MCP架构，通过实现一个简单的MCP Server，使用Windows端Claude桌面程序（等同于Host宿主应用，内部嵌入了MCP Client端），实现使用大模型对CRM数据库的分析。整体的架构如下。
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-f1ac20c5-5c4c-4b7b-af91-44e61f61a937.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-f1ac20c5-5c4c-4b7b-af91-44e61f61a937.png)
 
 ## MCP Server端的实现
 
@@ -346,15 +346,15 @@ MCP Server使用官方Python SDK可以很容易实现，使用@mcp.tool\(\)装�
 
 此时重启Claude后，在Setting中我们注意到配置已经生效，并处于Running状态，如下所示
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-42312bfd-f613-4e27-83fe-9d57d56c4519.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-42312bfd-f613-4e27-83fe-9d57d56c4519.png)
 
 在搜索框中可以看到4个注册的MCP工具，如下图所示：
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-cadb4e5a-f1e3-4699-ac9b-499a77fa2f85.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-cadb4e5a-f1e3-4699-ac9b-499a77fa2f85.png)
 
 点开锤子图标，可以看到4个MCP工具对应的函数详情，分别对应MCP Server代码中使用@mcp.tool\(\)装饰器的四个Python函数，描述对应函数的Python Doc，@mcp.tool\(\)装饰器主要使得函数注册到MCP工具表中，使其对MCP框架可见，同时装饰器会从函数签名、文档字符串和类型注解中提取元数据，用于生成工具描述。
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-7364c5f9-868d-4b4c-af91-6dde6d00b48c.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-7364c5f9-868d-4b4c-af91-6dde6d00b48c.png)
 
 ## 示例SQL Server CRM数据库数据库
 
@@ -362,31 +362,31 @@ MCP Server使用官方Python SDK可以很容易实现，使用@mcp.tool\(\)装�
 
 ### Activities表
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-d3d95484-69ae-4e38-bf6b-b23067a92d13.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-d3d95484-69ae-4e38-bf6b-b23067a92d13.png)
 
 ### Contacts表
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-ae325558-6b14-4816-aed5-c2b594fb69f0.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-ae325558-6b14-4816-aed5-c2b594fb69f0.png)
 
 ### Customers表
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-d20d5037-6813-45e2-affc-1fcdd25c7b29.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-d20d5037-6813-45e2-affc-1fcdd25c7b29.png)
 
 ### opportunities表
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-d8ad5f5f-cbf1-456e-8f2e-5db036f38c84.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-d8ad5f5f-cbf1-456e-8f2e-5db036f38c84.png)
 
 ### orderdetail表
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-7e17fad8-6e07-4f3f-8ece-96f0274f462d.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-7e17fad8-6e07-4f3f-8ece-96f0274f462d.png)
 
 ### Orders表
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-195de465-5d89-4833-9e56-22c2d30f744a.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-195de465-5d89-4833-9e56-22c2d30f744a.png)
 
 ### Products表
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-78dc35ab-2402-4b7f-b8ca-6dd08b784296.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-78dc35ab-2402-4b7f-b8ca-6dd08b784296.png)
 
 # 测试通过MCP连接已有CRM数据库进行大模型分析
 
@@ -394,7 +394,7 @@ MCP Server使用官方Python SDK可以很容易实现，使用@mcp.tool\(\)装�
 
 首先我们尝试一个简单的查询，通过LLM获取CRM数据的基本信息：
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-734a5958-b839-498a-9c6a-1d027dda4ade.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-734a5958-b839-498a-9c6a-1d027dda4ade.png)
 
 从记录可以看到，大模型非常聪明的根据已有的工具，做了系统性的探索，首先执行初步查询，发现查询名称可能不准确，使用list\_tables命令查看可用表，识别可能包含"customer"信息的表，检查其他可能包含客户信息的表，并最终发现"CrmDemo"数据库中的"Customers"表，并识别CustomerType可能用于识别VIP客户。
 
@@ -404,7 +404,7 @@ MCP Server使用官方Python SDK可以很容易实现，使用@mcp.tool\(\)装�
 
 我们第二个问题是更偏向分析的过程，如下图：
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-5a6a860c-948e-4dba-a925-9ad2a98b756f.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-5a6a860c-948e-4dba-a925-9ad2a98b756f.png)
 
 整个过程也非常丝滑，Claude系统性地获取所需信息，首先查询相关销售数据并收集潜在客户的基本信息，然后分析与这些客户的近期互动记录，同时查看Contacts表结构，查询相关活动历史，分析每个销售机会的历史记录和进展情况
 
@@ -416,7 +416,7 @@ Claude整合所有数据，考虑多个因素（销售机会阶段、转化概�
 
 下面我们指定一家公司的消费情况，过程与上一小节类似。
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-a925ace0-66c0-4c5e-9d77-12d77fd76a8c.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-a925ace0-66c0-4c5e-9d77-12d77fd76a8c.png)
 
 可以看到Claude非常准的地理解了我们的意图，并结果化的展现出我们所需的分析报告。
 
@@ -424,7 +424,7 @@ Claude整合所有数据，考虑多个因素（销售机会阶段、转化概�
 
 下面是一个洞察数据的示例：
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-6fc75364-b1be-4797-8eae-cceb1c6eeee8.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-6fc75364-b1be-4797-8eae-cceb1c6eeee8.png)
 
 这个案例展示的内容已经超过了MCP基本的查询和分析，展示出数据洞察的强大能力，整个过程包括：
 
@@ -443,7 +443,7 @@ Claude整合所有数据，考虑多个因素（销售机会阶段、转化概�
 
 下面例子，我们不仅可以文字输入，还可以直接生成基于HTML5 React框架展现出客户化前端：
 
-![image](assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-26076c00-d83e-49df-8f92-9ad3f3afe1ee.png)
+![image](/blog/assets/images/2025-04-01-mcp-model-context-protocol/mcp-model-context-protocol-26076c00-d83e-49df-8f92-9ad3f3afe1ee.png)
 
 下面是整个问答的细节，markdown格式，附注如下：
     

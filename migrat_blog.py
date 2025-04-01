@@ -30,19 +30,25 @@ logger = logging.getLogger(__name__)
 
 
 class CnblogsToGitHub:
-    def __init__(self, username, github_dir, incremental=True):
+    def __init__(self, username, github_dir, incremental=True, base_url=''):
         """
         初始化参数
         :param username: 博客园用户名
         :param github_dir: 本地GitHub仓库目录
         :param incremental: 是否使用增量更新模式
+        :param base_url: 网站的基础URL路径（例如 /blog/）
         """
         self.username = username
         self.github_dir = github_dir
         self.post_dir = os.path.join(github_dir, '_posts')
-        self.assets_dir = os.path.join(github_dir, 'assets', 'images')
+        self.assets_dir = os.path.join(github_dir, 'blog/assets', 'images')
         self.data_dir = os.path.join(github_dir, '.cnblogs_data')
         self.incremental = incremental
+        self.base_url = base_url.strip('/')  # 去除末尾的斜杠
+
+        # 如果base_url不为空，确保它以斜杠结尾
+        if self.base_url and not self.base_url.endswith('/'):
+            self.base_url += '/'
 
         # 创建必要的目录
         os.makedirs(self.post_dir, exist_ok=True)
@@ -73,7 +79,7 @@ class CnblogsToGitHub:
 
     def fix_existing_image_paths(self):
         """
-        修复已存在的Markdown文件中的图片路径，将/assets/改为assets/
+        修复已存在的Markdown文件中的图片路径
         """
         try:
             logger.info("正在检查并修复已有文章的图片路径...")
@@ -87,8 +93,15 @@ class CnblogsToGitHub:
                 with open(filepath, 'r', encoding='utf-8') as f:
                     content = f.read()
 
-                # 查找并替换所有图片路径
-                updated_content = re.sub(r'!\[.*?\]\(/assets/', r'![image](assets/', content)
+                # 替换不同模式的路径到正确的格式
+                updated_content = content
+
+                # 处理以/assets/开头的路径
+                updated_content = re.sub(r'!\[.*?\]\(/assets/', f'![image]({self.base_url}assets/', updated_content)
+
+                # 处理不带前缀的assets/开头的路径
+                if self.base_url:
+                    updated_content = re.sub(r'!\[.*?\]\(assets/', f'![image]({self.base_url}assets/', updated_content)
 
                 if content != updated_content:
                     with open(filepath, 'w', encoding='utf-8') as f:
@@ -236,8 +249,8 @@ class CnblogsToGitHub:
                     f.write(chunk)
 
             # 根据GitHub Pages网站的基础URL构建相对路径
-            # 不使用开头的斜杠，这样在GitHub Pages上会正确解析
-            github_path = f"assets/images/{post_dir_name}/{img_name}"
+            # 使用base_url作为前缀
+            github_path = f"{self.base_url}assets/images/{post_dir_name}/{img_name}"
             logger.info(f"图片已下载: {img_url} -> {github_path}")
             return github_path
 
@@ -323,7 +336,7 @@ class CnblogsToGitHub:
             def replace_img_url(match):
                 img_url = match.group(1)
                 # 如果是已经处理过的GitHub路径，则不再处理
-                if img_url.startswith('assets/'):
+                if img_url.startswith(f"{self.base_url}assets/"):
                     return f"![image]({img_url})"
 
                 new_url = self.download_image(img_url, title, published_date)
@@ -448,13 +461,15 @@ def main():
     parser.add_argument('-m', '--max-pages', type=int, help='最大页数')
     parser.add_argument('-l', '--limit', type=int, help='最大文章数限制')
     parser.add_argument('-f', '--full', action='store_true', help='全量下载模式，默认为增量更新模式')
+    parser.add_argument('-b', '--base-url', default='blog/', help='网站的基础URL路径，例如 blog/')
 
     args = parser.parse_args()
 
     cnblogs2github = CnblogsToGitHub(
         username=args.username,
         github_dir=args.github_dir,
-        incremental=not args.full
+        incremental=not args.full,
+        base_url=args.base_url
     )
 
     cnblogs2github.run(args.page, args.max_pages, args.limit)

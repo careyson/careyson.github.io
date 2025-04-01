@@ -204,7 +204,7 @@ class CnblogsToGitHub:
                     f.write(chunk)
 
             # 返回GitHub Pages中的相对路径
-            github_path = f"/assets/images/{post_dir_name}/{img_name}"
+            github_path = f"blog/assets/images/{post_dir_name}/{img_name}"
             logger.info(f"图片已下载: {img_url} -> {github_path}")
             return github_path
 

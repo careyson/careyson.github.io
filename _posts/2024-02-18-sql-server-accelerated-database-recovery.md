@@ -31,7 +31,7 @@ tags: [博客园迁移]
 
 本篇原理，根据论文“Constant Time Recovery in Azure SQL Database”通读解析。
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218114438434-437100089.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218114438434-437100089.png)
 
 ## 历史
 
@@ -62,7 +62,7 @@ tags: [博客园迁移]
 
 快照隔离基本上即使行版本控制，当一个事物修改数据后，会直接更新数据，并把老版本的数据存到链表中，老版本的数据与修改数据的事务ID关联，其他并发查询会比对TimeStamp，展示合适的版本数据，如果行版本对应的事务提交，则行版本将不再可见，会被清除，示意图如下：
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218114513084-1957047143.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218114513084-1957047143.png)
 
 因此启用ADR之后，所有的DML操作都会被行版本存储，该存储会存在用户数据库中，SQL Server内称之为PVS（Persistent Version Store）
 
@@ -72,7 +72,7 @@ SQL Server会存两种数据，一种是In-Row，一种是Off-Row
 
 In-Row是每次修改仅修改小部分数据，比如一行10列，仅修改一列，那修改只需记录这一列的变化，这种行版本会存储在In-Row Data中，从原理可以看出，这会带来额外的性能成本，因为B-Tree特点，行版本多了导致空间占用多，数据修改可能导致更多的Page-split（同时还要维护B-Tree结构，比如导致父节点Split），对于高频DML这个开销非常高。
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218133921992-2030726554.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218133921992-2030726554.png)
 
 红字部分是行额外增加的部分，如果一个行本身很长，这个增加可能影响不大，但行如果本身很小，这个成本将会显著提高。
 
@@ -84,7 +84,7 @@ In-Row是每次修改仅修改小部分数据，比如一行10列，仅修改一
 
 每次对于数据的修改，都是存储旧数据到行版本中，并以事务ID关联，因此对于事务回滚，不再需要传统的compensation log，比如，传统的WAL模式如果删除3条数据，对应的回滚示意应该如下：
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218133948292-96897181.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218133948292-96897181.png)
 
 可以看到绿色部分会实际进行操作，这也是为什么一个大事务如果回滚，甚至回滚时间会超过已执行时间的原因。
 
@@ -92,7 +92,7 @@ In-Row是每次修改仅修改小部分数据，比如一行10列，仅修改一
 
 使用逻辑回滚，示意图如下:
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134009935-105405564.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134009935-105405564.png)
 
 相比于通过补偿操作，修改页内数据，该方式在Rollback时，只需要将当前页的指针重新由“Aborted Version”这一页指向上一个事务提交修改的“Commited Version”，这个操作是元数据操作，而不涉及物理的页内数据修改，因此速度应该是几何级提升，验证部分在下文。
 
@@ -115,7 +115,7 @@ In-Row是每次修改仅修改小部分数据，比如一行10列，仅修改一
 
 涉及到SLOG的整体恢复流程如下，相比于使用事务日志进行阶段2和阶段3，使用SLOG成本会低2个数量级，因此恢复时间也同样会低2个数量级。
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134029537-659031423.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134029537-659031423.png)
 
 # ADR验证
 
@@ -129,15 +129,15 @@ In-Row是每次修改仅修改小部分数据，比如一行10列，仅修改一
 
 但第二和第三阶段就得看运气了，一个巨大的长事务没有提交可能导致非常长的Recovery时间，例如我的测试实例，我写一个写2000万数据的长事务，在不提交事务的情况下重启：
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134101318-1235697070.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134101318-1235697070.png)
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134113637-1052498761.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134113637-1052498761.png)
 
 可以看到1阶段 9ms，二阶段156S， 三阶段209S，这段时间加起来就是不可用时间，这还仅仅是我的测试实例，如果用户真有长事务，重启停机时间通常是噩梦。
 
 如果启用了ADR，整个恢复过程
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134123822-1419748656.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134123822-1419748656.png)
 
 通过启用ADR，重复上面步骤，发现Recovery时间从364S，变为1S
     
@@ -145,7 +145,7 @@ In-Row是每次修改仅修改小部分数据，比如一行10列，仅修改一
     ALTER DATABASE testrecovery SET ACCELERATED_DATABASE_RECOVERY = ON;
     GO
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134155436-2100286891.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134155436-2100286891.png)
 
 结论: ADR的确能够将Recovery时间缩短2个数量级。
 
@@ -160,15 +160,15 @@ In-Row是每次修改仅修改小部分数据，比如一行10列，仅修改一
 
 回滚使用了18秒
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134230076-1259919462.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134230076-1259919462.png)
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134247434-853105328.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134247434-853105328.png)
 
 下面是启用ADR的截图
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134307515-2072633470.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134307515-2072633470.png)
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134319673-16018696.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134319673-16018696.png)
 
 下面是单个SQL插入200万数据的测试语句
     
@@ -192,9 +192,9 @@ In-Row是每次修改仅修改小部分数据，比如一行10列，仅修改一
 
 我们重新设计一个场景，在启用ADR和非ADR的数据库，启用事务后插入200万事务不提交，在过去这部分活动日志无法被截断，
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-79a778ce-7580-4d4e-a4ff-2b9e0dcb28b8.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-79a778ce-7580-4d4e-a4ff-2b9e0dcb28b8.png)
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-d384ce69-8128-45f8-8650-15fbcc274c6e.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-d384ce69-8128-45f8-8650-15fbcc274c6e.png)
 
 可以看到，启用ADR的数据库，活动日志不再会阻塞日志截断
 
@@ -227,11 +227,11 @@ In-Row是每次修改仅修改小部分数据，比如一行10列，仅修改一
 
 启用ADR的大批量插入：
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134408299-2038773532.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134408299-2038773532.png)
 
 未启用ADR的大语句插入：
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134419025-931820169.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134419025-931820169.png)
 
 可以看到几乎没有差别，只是IO稍微增高，我怀疑是额外的In-Row Data导致，CPU开销略微增加和微软论文中类似。
 
@@ -239,7 +239,7 @@ In-Row是每次修改仅修改小部分数据，比如一行10列，仅修改一
 
 这部分成本难以衡量，目前直接使用论文中的结论
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134538518-523848350.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134538518-523848350.png)
 
 Delete和Insert成本比较低，只需要标记元数据，而Update需要完整操作数据，成本比较高。Clean Up效率看上去绝大多数场景来看，可接受
 
@@ -251,7 +251,7 @@ Delete和Insert成本比较低，只需要标记元数据，而Update需要完�
 
 根据微软文档，TPCC和TPCE在启用ADR后较小列长和较大列长的场景性能下降如下图，
 
-![image](assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134515111-1715476629.png)
+![image](blog/assets/images/2024-02-18-sql-server-accelerated-database-recovery/sql-server-accelerated-database-recovery-35368-20240218134515111-1715476629.png)
 
 根据测试，对于有高频写入的小事务，启用ADR会有较多性能开销，但从数据库可用性角度、回滚风险角度来看，该功能对于较大实例的收益会大于风险。
 

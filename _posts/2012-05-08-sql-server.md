@@ -6,7 +6,7 @@ categories: blog
 tags: [博客园迁移]
 ---
 
-SQL Server的文章写了也不少了，一直没有做一个目录方便大家阅读。现在把之前写的关于SQL Server的文章做一个目录，方便大家阅读 ![image](/assets/images/2012-05-08-sql-server/sql-server-201205081104525170.png)
+SQL Server的文章写了也不少了，一直没有做一个目录方便大家阅读。现在把之前写的关于SQL Server的文章做一个目录，方便大家阅读 ![image](https://cdn.jsdelivr.net/gh/careyson/careyson.github.io@main/assets/images/2012-05-08-sql-server/sql-server-201205081104525170.png)
 
 ### SQL入门
 

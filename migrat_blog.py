@@ -30,13 +30,17 @@ logger = logging.getLogger(__name__)
 
 
 class CnblogsToGitHub:
-    def __init__(self, username, github_dir, incremental=True, base_url=''):
+    def __init__(self, username, github_dir, incremental=True, base_url='', github_username='', github_repo='',
+                 use_cdn=False):
         """
         初始化参数
         :param username: 博客园用户名
         :param github_dir: 本地GitHub仓库目录
         :param incremental: 是否使用增量更新模式
         :param base_url: 网站的基础URL路径（现在默认为空）
+        :param github_username: GitHub用户名，用于CDN链接
+        :param github_repo: GitHub仓库名，用于CDN链接
+        :param use_cdn: 是否使用CDN链接
         """
         self.username = username
         self.github_dir = github_dir
@@ -45,6 +49,14 @@ class CnblogsToGitHub:
         self.data_dir = os.path.join(github_dir, '.cnblogs_data')
         self.incremental = incremental
         self.base_url = base_url.strip('/') if base_url else ''
+        self.github_username = github_username
+        self.github_repo = github_repo
+        self.use_cdn = use_cdn
+
+        # 检查CDN使用的必要参数
+        if self.use_cdn and (not self.github_username or not self.github_repo):
+            logger.warning("使用CDN需要提供GitHub用户名和仓库名，将使用普通URL。")
+            self.use_cdn = False
 
         # 文件名序号计数器
         self.file_counter = {}
@@ -83,7 +95,8 @@ class CnblogsToGitHub:
 
     def fix_existing_image_paths(self):
         """
-        修复已存在的Markdown文件中的图片路径，统一为/assets/images/...格式
+        修复已存在的Markdown文件中的图片路径
+        如果使用CDN，将路径转换为CDN格式
         """
         try:
             logger.info("正在检查并修复已有文章的图片路径...")
@@ -99,18 +112,48 @@ class CnblogsToGitHub:
 
                 # 替换不同模式的路径到正确的格式
                 updated_content = content
-                correct_prefix = "/assets/images"
 
-                # 替换 assets/images/... 为 /assets/images/...
-                updated_content = re.sub(r'!\[.*?\]\(assets/images/', f'![image]({correct_prefix}/', updated_content)
+                if self.use_cdn:
+                    # 使用CDN格式
+                    cdn_prefix = f"https://cdn.jsdelivr.net/gh/{self.github_username}/{self.github_repo}@main"
 
-                # 替换 /blog/assets/images/... 为 /assets/images/...
-                updated_content = re.sub(r'!\[.*?\]\(/blog/assets/images/', f'![image]({correct_prefix}/',
-                                         updated_content)
+                    # 替换普通路径为CDN路径
+                    # 处理 /assets/images/...
+                    updated_content = re.sub(r'!\[.*?\]\(/assets/images/(.*?)(?:\)|\s)',
+                                             f'![image]({cdn_prefix}/assets/images/\\1)', updated_content)
 
-                # 替换 blog/assets/images/... 为 /assets/images/...
-                updated_content = re.sub(r'!\[.*?\]\(blog/assets/images/', f'![image]({correct_prefix}/',
-                                         updated_content)
+                    # 处理 assets/images/...
+                    updated_content = re.sub(r'!\[.*?\]\(assets/images/(.*?)(?:\)|\s)',
+                                             f'![image]({cdn_prefix}/assets/images/\\1)', updated_content)
+
+                    # 处理 /blog/assets/images/...
+                    updated_content = re.sub(r'!\[.*?\]\(/blog/assets/images/(.*?)(?:\)|\s)',
+                                             f'![image]({cdn_prefix}/assets/images/\\1)', updated_content)
+
+                    # 处理 blog/assets/images/...
+                    updated_content = re.sub(r'!\[.*?\]\(blog/assets/images/(.*?)(?:\)|\s)',
+                                             f'![image]({cdn_prefix}/assets/images/\\1)', updated_content)
+                else:
+                    # 使用普通格式
+                    correct_prefix = "/assets/images"
+
+                    # 替换 assets/images/... 为 /assets/images/...
+                    updated_content = re.sub(r'!\[.*?\]\(assets/images/', f'![image]({correct_prefix}/',
+                                             updated_content)
+
+                    # 替换 /blog/assets/images/... 为 /assets/images/...
+                    updated_content = re.sub(r'!\[.*?\]\(/blog/assets/images/', f'![image]({correct_prefix}/',
+                                             updated_content)
+
+                    # 替换 blog/assets/images/... 为 /assets/images/...
+                    updated_content = re.sub(r'!\[.*?\]\(blog/assets/images/', f'![image]({correct_prefix}/',
+                                             updated_content)
+
+                    # 替换CDN链接为普通链接（如果需要切换回普通链接）
+                    if self.github_username and self.github_repo:
+                        cdn_pattern = f"https://cdn.jsdelivr.net/gh/{self.github_username}/{self.github_repo}@main/assets/images/"
+                        updated_content = re.sub(r'!\[.*?\]\(' + re.escape(cdn_pattern), f'![image]({correct_prefix}/',
+                                                 updated_content)
 
                 if content != updated_content:
                     with open(filepath, 'w', encoding='utf-8') as f:
@@ -257,8 +300,15 @@ class CnblogsToGitHub:
                 for chunk in response.iter_content(chunk_size=8192):
                     f.write(chunk)
 
-            # 构建正确的路径格式 - 直接使用/assets/images/...格式
-            github_path = f"/assets/images/{post_dir_name}/{img_name}"
+            # 构建正确的路径格式
+            local_path = f"/assets/images/{post_dir_name}/{img_name}"
+
+            # 如果需要使用CDN，构建CDN链接
+            if self.use_cdn:
+                github_path = f"https://cdn.jsdelivr.net/gh/{self.github_username}/{self.github_repo}@main{local_path}"
+            else:
+                github_path = local_path
+
             logger.info(f"图片已下载: {img_url} -> {github_path}")
             return github_path
 
@@ -345,13 +395,13 @@ class CnblogsToGitHub:
                 img_url = match.group(1)
 
                 # 检查是否已经是正确的格式
-                if img_url.startswith("/assets/images/"):
+                if self.use_cdn and img_url.startswith("https://cdn.jsdelivr.net/gh/"):
                     return f"![image]({img_url})"
 
-                # 如果是其他格式的已处理图片，也不再处理
-                if self.base_url and img_url.startswith(f"/{self.base_url}/assets/images/"):
+                if not self.use_cdn and img_url.startswith("/assets/images/"):
                     return f"![image]({img_url})"
 
+                # 下载并生成新URL
                 new_url = self.download_image(img_url, title, published_date)
                 return f"![image]({new_url})"
 
@@ -487,6 +537,9 @@ def main():
     parser.add_argument('-l', '--limit', type=int, help='最大文章数限制')
     parser.add_argument('-f', '--full', action='store_true', help='全量下载模式，默认为增量更新模式')
     parser.add_argument('-b', '--base-url', default='', help='网站的基础URL路径（如不需要前缀，请保持为空）')
+    parser.add_argument('-c', '--use-cdn', action='store_true', help='使用CDN链接引用图片')
+    parser.add_argument('-gu', '--github-username', default='', help='GitHub用户名，用于CDN链接')
+    parser.add_argument('-gr', '--github-repo', default='', help='GitHub仓库名，用于CDN链接')
 
     args = parser.parse_args()
 
@@ -494,7 +547,10 @@ def main():
         username=args.username,
         github_dir=args.github_dir,
         incremental=not args.full,
-        base_url=args.base_url
+        base_url=args.base_url,
+        github_username=args.github_username,
+        github_repo=args.github_repo,
+        use_cdn=args.use_cdn
     )
 
     cnblogs2github.run(args.page, args.max_pages, args.limit)
@@ -502,3 +558,11 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+# 使用 CDN 链接
+#python migrate_blog.py -u careyson -g /path/to/your/local/github/repo -c -gu careyson -gr careyson.github.io
+#python migrat_blog.py -u careyson -g  F:\yunjian.github.io -c -gu careyson -gr careyson.github.io -c --max-pages 1
+
+# 不使用 CDN 链接（普通模式）
+#python migrate_blog.py -u 你的博客园用户名 -g /path/to/your/local/github/repo

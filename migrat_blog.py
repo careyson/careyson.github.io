@@ -36,15 +36,23 @@ class CnblogsToGitHub:
         :param username: 博客园用户名
         :param github_dir: 本地GitHub仓库目录
         :param incremental: 是否使用增量更新模式
-        :param base_url: 网站的基础URL路径（默认为"blog"）
+        :param base_url: 网站的基础URL路径（现在默认为空）
         """
         self.username = username
         self.github_dir = github_dir
         self.post_dir = os.path.join(github_dir, '_posts')
-        self.assets_dir = os.path.join(github_dir, 'assets', 'images')  # 图片放回正确的assets/images目录
+        self.assets_dir = os.path.join(github_dir, 'assets', 'images')
         self.data_dir = os.path.join(github_dir, '.cnblogs_data')
         self.incremental = incremental
         self.base_url = base_url.strip('/') if base_url else ''
+
+        # 文件名序号计数器
+        self.file_counter = {}
+
+        # 创建必要的目录
+        os.makedirs(self.post_dir, exist_ok=True)
+        os.makedirs(self.assets_dir, exist_ok=True)
+        os.makedirs(self.data_dir, exist_ok=True)
 
         # 创建必要的目录
         os.makedirs(self.post_dir, exist_ok=True)
@@ -75,7 +83,7 @@ class CnblogsToGitHub:
 
     def fix_existing_image_paths(self):
         """
-        修复已存在的Markdown文件中的图片路径
+        修复已存在的Markdown文件中的图片路径，统一为/assets/images/...格式
         """
         try:
             logger.info("正在检查并修复已有文章的图片路径...")
@@ -91,41 +99,18 @@ class CnblogsToGitHub:
 
                 # 替换不同模式的路径到正确的格式
                 updated_content = content
+                correct_prefix = "/assets/images"
 
-                if self.base_url:
-                    # 统一为 /blog/assets/images/... 格式
-                    correct_prefix = f"/{self.base_url}/assets/images"
+                # 替换 assets/images/... 为 /assets/images/...
+                updated_content = re.sub(r'!\[.*?\]\(assets/images/', f'![image]({correct_prefix}/', updated_content)
 
-                    # 替换 assets/images/... 为 /blog/assets/images/...
-                    updated_content = re.sub(r'!\[.*?\]\(assets/images/', f'![image]({correct_prefix}/',
-                                             updated_content)
+                # 替换 /blog/assets/images/... 为 /assets/images/...
+                updated_content = re.sub(r'!\[.*?\]\(/blog/assets/images/', f'![image]({correct_prefix}/',
+                                         updated_content)
 
-                    # 替换 /assets/images/... 为 /blog/assets/images/...
-                    updated_content = re.sub(r'!\[.*?\]\(/assets/images/', f'![image]({correct_prefix}/',
-                                             updated_content)
-
-                    # 替换 blog/assets/images/... 为 /blog/assets/images/...
-                    updated_content = re.sub(r'!\[.*?\]\(blog/assets/images/', f'![image]({correct_prefix}/',
-                                             updated_content)
-
-                    # 替换 /blog/assets/images/... 为统一格式（确保没有重复的/）
-                    updated_content = re.sub(r'!\[.*?\]\(/blog/assets/images/', f'![image]({correct_prefix}/',
-                                             updated_content)
-                else:
-                    # 统一为 /assets/images/... 格式
-                    correct_prefix = "/assets/images"
-
-                    # 替换 assets/images/... 为 /assets/images/...
-                    updated_content = re.sub(r'!\[.*?\]\(assets/images/', f'![image]({correct_prefix}/',
-                                             updated_content)
-
-                    # 替换 /blog/assets/images/... 为 /assets/images/...
-                    updated_content = re.sub(r'!\[.*?\]\(/blog/assets/images/', f'![image]({correct_prefix}/',
-                                             updated_content)
-
-                    # 替换 blog/assets/images/... 为 /assets/images/...
-                    updated_content = re.sub(r'!\[.*?\]\(blog/assets/images/', f'![image]({correct_prefix}/',
-                                             updated_content)
+                # 替换 blog/assets/images/... 为 /assets/images/...
+                updated_content = re.sub(r'!\[.*?\]\(blog/assets/images/', f'![image]({correct_prefix}/',
+                                         updated_content)
 
                 if content != updated_content:
                     with open(filepath, 'w', encoding='utf-8') as f:
@@ -272,14 +257,8 @@ class CnblogsToGitHub:
                 for chunk in response.iter_content(chunk_size=8192):
                     f.write(chunk)
 
-            # 构建正确的路径格式
-            if self.base_url:
-                # 使用 /blog/assets/images/... 格式
-                github_path = f"/{self.base_url}/assets/images/{post_dir_name}/{img_name}"
-            else:
-                # 如果没有基础URL，使用 /assets/images/... 格式
-                github_path = f"/assets/images/{post_dir_name}/{img_name}"
-
+            # 构建正确的路径格式 - 直接使用/assets/images/...格式
+            github_path = f"/assets/images/{post_dir_name}/{img_name}"
             logger.info(f"图片已下载: {img_url} -> {github_path}")
             return github_path
 
@@ -366,13 +345,12 @@ class CnblogsToGitHub:
                 img_url = match.group(1)
 
                 # 检查是否已经是正确的格式
-                if self.base_url:
-                    if img_url.startswith(f"/{self.base_url}/assets/") or img_url.startswith(
-                            f"{self.base_url}/assets/"):
-                        return f"![image]({img_url})"
-                else:
-                    if img_url.startswith("/assets/"):
-                        return f"![image]({img_url})"
+                if img_url.startswith("/assets/images/"):
+                    return f"![image]({img_url})"
+
+                # 如果是其他格式的已处理图片，也不再处理
+                if self.base_url and img_url.startswith(f"/{self.base_url}/assets/images/"):
+                    return f"![image]({img_url})"
 
                 new_url = self.download_image(img_url, title, published_date)
                 return f"![image]({new_url})"
@@ -404,6 +382,18 @@ class CnblogsToGitHub:
             # 创建文件名: yyyy-mm-dd-title.md
             safe_title = re.sub(r'[^a-zA-Z0-9\-_]', '-', title.lower())
             safe_title = re.sub(r'-+', '-', safe_title).strip('-')
+
+            # 如果标题为空或只有特殊字符（生成的safe_title为空），则使用序号
+            if not safe_title:
+                # 获取当前日期的计数器
+                if published_date not in self.file_counter:
+                    self.file_counter[published_date] = 1
+                else:
+                    self.file_counter[published_date] += 1
+
+                # 使用两位数序号，例如01, 02, ...
+                safe_title = f"{self.file_counter[published_date]:02d}"
+
             filename = f"{published_date}-{safe_title}.md"
             filepath = os.path.join(self.post_dir, filename)
 
@@ -496,7 +486,7 @@ def main():
     parser.add_argument('-m', '--max-pages', type=int, help='最大页数')
     parser.add_argument('-l', '--limit', type=int, help='最大文章数限制')
     parser.add_argument('-f', '--full', action='store_true', help='全量下载模式，默认为增量更新模式')
-    parser.add_argument('-b', '--base-url', default='blog', help='网站的基础URL路径，例如"blog"，默认为"blog"')
+    parser.add_argument('-b', '--base-url', default='', help='网站的基础URL路径（如不需要前缀，请保持为空）')
 
     args = parser.parse_args()
 

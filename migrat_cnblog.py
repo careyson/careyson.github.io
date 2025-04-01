@@ -40,7 +40,7 @@ class CnblogsToGitHub:
         self.username = username
         self.github_dir = github_dir
         self.post_dir = os.path.join(github_dir, '_posts')
-        self.assets_dir = os.path.join(github_dir, 'assets', 'images')
+        self.assets_dir = os.path.join(github_dir, 'asset', 'images')
         self.data_dir = os.path.join(github_dir, '.cnblogs_data')
         self.incremental = incremental
 
@@ -431,7 +431,7 @@ if __name__ == '__main__':
     main()
 
 # 增量更新模式（默认）
-#python migrat_cnblog.py -u careyson -g /path/to/your/local/github/repo --max-pages 1
+#python migrat_cnblog.py -u careyson -g  F:\yunjian.github.io --max-pages 1
 
 # 全量下载模式
 #python migrat_cnblog.py -u 你的博客园用户名 -g /path/to/your/local/github/repo -f

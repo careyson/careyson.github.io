@@ -1,0 +1,57 @@
+{
+  "https://www.cnblogs.com/CareySon/archive/2012/05/08/2489748.html": {
+    "title": "SQL Server文章目录",
+    "date": "2012-05-08",
+    "hash": "f05b609784e90a384ef1f1e192cae384"
+  },
+  "https://www.cnblogs.com/CareySon/p/18801509": {
+    "title": "为什么构造函数需要尽可能的简单",
+    "date": "2025-03-31",
+    "hash": "46164bd559fd63589a294bc5a7ffac08"
+  },
+  "https://www.cnblogs.com/CareySon/p/18795982/sql_server_to_aliyun_rds_for_sqlserver_physical_migration": {
+    "title": "如何通过物理备份将线下SQL Server迁移到阿里云RDS for SQL Server",
+    "date": "2025-03-27",
+    "hash": "9e5a4c9c0d6ae4662ef9c7d9828b625a"
+  },
+  "https://www.cnblogs.com/CareySon/p/18781531/why_avoid_er_or_suffixes_in_object_naming": {
+    "title": "对象命名为何需要避免'-er'和'-or'后缀",
+    "date": "2025-03-20",
+    "hash": "a0e7811f5999cf8a1de531708c36c810"
+  },
+  "https://www.cnblogs.com/CareySon/p/18773643/INTRODUCE_TO_SQLSERVER_COLUMSTORE_AND_HTAP": {
+    "title": "SQL Server 列存储&HTAP介绍",
+    "date": "2025-03-15",
+    "hash": "a3d1c9dbd966069c468b95a006362c68"
+  },
+  "https://www.cnblogs.com/CareySon/p/18762884/how_to_write_testable_code": {
+    "title": "如何编写易于单元测试的代码",
+    "date": "2025-03-10",
+    "hash": "fdcea1ad5bd8059359fc309c9e69e581"
+  },
+  "https://www.cnblogs.com/CareySon/p/18757020/Logging_best_practice_for_developer": {
+    "title": "开发者必知的日志记录最佳实践",
+    "date": "2025-03-07",
+    "hash": "8805c0e4272ec8152209447d3b228b57"
+  },
+  "https://www.cnblogs.com/CareySon/p/18753299/SQL_SERVER_2015_AI_New_Feature": {
+    "title": "SQL Server 2025 AI相关能力初探",
+    "date": "2025-03-05",
+    "hash": "d1d6ad960790465d7b8ed8e131d6392c"
+  },
+  "https://www.cnblogs.com/CareySon/p/18741374": {
+    "title": "对象命名怎么上手？从现实世界",
+    "date": "2025-02-27",
+    "hash": "6a2730289eb930fc8a39ee059bb0ae3b"
+  },
+  "https://www.cnblogs.com/CareySon/p/18711135": {
+    "title": "开发中对象命名的一点思考",
+    "date": "2025-02-12",
+    "hash": "8470a08ad5a034fa539d743e959f2686"
+  },
+  "https://www.cnblogs.com/CareySon/p/18019162": {
+    "title": "SQL Server Accelerated Database Recovery调研",
+    "date": "2024-02-18",
+    "hash": "9f575076ff270ff808d7b19bef919fae"
+  }
+}

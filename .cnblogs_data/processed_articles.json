@@ -4,6 +4,11 @@
     "date": "2012-05-08",
     "hash": "f05b609784e90a384ef1f1e192cae384"
   },
+  "https://www.cnblogs.com/CareySon/p/18805011/mcp_for_crm_demo": {
+    "title": "MCP （Model Context Protocol）初体验：企业数据与大模型融合初探",
+    "date": "2025-04-01",
+    "hash": "1b7fa6c035c7a35e4793470c3e6c8c8e"
+  },
   "https://www.cnblogs.com/CareySon/p/18801509": {
     "title": "为什么构造函数需要尽可能的简单",
     "date": "2025-03-31",
@@ -48,10 +53,5 @@
     "title": "开发中对象命名的一点思考",
     "date": "2025-02-12",
     "hash": "8470a08ad5a034fa539d743e959f2686"
-  },
-  "https://www.cnblogs.com/CareySon/p/18019162": {
-    "title": "SQL Server Accelerated Database Recovery调研",
-    "date": "2024-02-18",
-    "hash": "9f575076ff270ff808d7b19bef919fae"
   }
 }

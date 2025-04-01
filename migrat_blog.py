@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 
 class CnblogsToGitHub:
-    def __init__(self, username, github_dir, incremental=True, base_url='blog'):
+    def __init__(self, username, github_dir, incremental=True, base_url=''):
         """
         初始化参数
         :param username: 博客园用户名

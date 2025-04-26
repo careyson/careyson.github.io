@@ -1,8 +1,10 @@
 # _config.yml 文件内容
 
 # 主题设置
-remote_theme: "mmistakes/minimal-mistakes@4.24.0"
-minimal_mistakes_skin: "dark" # 可选: default, air, aqua, contrast, dark, dirt, neon, mint, plum, sunrise
+#remote_theme: "mmistakes/minimal-mistakes@4.24.0"
+#minimal_mistakes_skin: "dark" # 可选: default, air, aqua, contrast, dark, dirt, neon, mint, plum, sunrise
+
+theme: jekyll-theme-primer           # 仅此一行即可指定主题
 
 # 站点设置
 locale: "zh-CN"

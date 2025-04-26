@@ -1,13 +1,12 @@
 # _config.yml 文件内容
 
-# 主题设置
-remote_theme: "mmistakes/minimal-mistakes@4.24.0"
-minimal_mistakes_skin: "dark" # 可选: default, air, aqua, contrast, dark, dirt, neon, mint, plum, sunrise
+title: "我的博客"
+theme: minimal-mistakes-jekyll
+minimal_mistakes_skin: "dark"
+minimal_mistakes_skin2: "default"
 
 # 站点设置
 locale: "zh-CN"
-title: "我的简洁酷炫博客"
-subtitle: "思考与创造"
 name: "你的名字"
 description: "个人博客和项目展示"
 url: "https://careyson.github.io" # 替换为你的GitHub Pages URL

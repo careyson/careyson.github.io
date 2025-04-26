@@ -1,19 +1,14 @@
 title: 我的博客
 description: 简单可依赖的技术与随想
 author: 宋雨竹
-#theme: jekyll-theme-primer   # GitHub Pages 自带，无需 remote_theme
+theme: jekyll-theme-primer   # GitHub Pages 自带，无需 remote_theme
 url: "https://careyson.github.io"
 
 
 
-remote_theme: "mmistakes/minimal-mistakes"  # 远程主题仓库
-
 plugins:
-  - jekyll-feed
-  - jekyll-paginate
-  - jekyll-include-cache
-
-
+  - jekyll-feed              # 允许，Pages 自带
+  - jekyll-paginate      # ✅ 开分页
 
 paginate:      5         # 每页文章数
 paginate_path: "/page:num/"

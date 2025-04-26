@@ -1,0 +1,46 @@
+---
+layout: default       <!-- 继续使用主题自带的默认布局 -->
+title: 首页
+---
+
+<!-- 站点欢迎区 -->
+<h1>👋 宋沄劍的个人博客</h1>
+<p>记录数据库研发、AI 实验与生活思考。</p>
+<hr>
+
+<!-- 最近文章列表（分页） -->
+<h2>最近文章</h2>
+
+{% for post in paginator.posts %}
+  <article>
+    <h3>
+      <a href="{{ post.url | relative_url }}">
+        {{ post.title }}
+      </a>
+    </h3>
+    <p class="post-meta">
+      {{ post.date | date: "%Y-%m-%d" }}
+    </p>
+
+    <!-- 自动生成的摘要；没有 excerpt 时可回退到前 140 字 -->
+    {{ post.excerpt | default: post.content | truncatewords: 40 }}
+
+    <p><a href="{{ post.url | relative_url }}">阅读全文…</a></p>
+    <hr>
+  </article>
+{% endfor %}
+
+<!-- 分页导航 -->
+{% if paginator.total_pages > 1 %}
+<nav aria-label="分页导航">
+  {% if paginator.previous_page %}
+    <a href="{{ paginator.previous_page_path | relative_url }}">&laquo; 上一页</a>
+  {% endif %}
+
+  <span>第 {{ paginator.page }} / {{ paginator.total_pages }} 页</span>
+
+  {% if paginator.next_page %}
+    <a href="{{ paginator.next_page_path | relative_url }}">下一页 &raquo;</a>
+  {% endif %}
+</nav>
+{% endif %}

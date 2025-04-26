@@ -53,5 +53,10 @@
     "title": "开发中对象命名的一点思考",
     "date": "2025-02-12",
     "hash": "8470a08ad5a034fa539d743e959f2686"
+  },
+  "https://www.cnblogs.com/CareySon/p/18827525/mcp_lifecycle_via_demo": {
+    "title": "通过一个DEMO理解MCP（模型上下文协议）的生命周期",
+    "date": "2025-04-15",
+    "hash": "ce150801ec3b38d5b7a1c08af48ad4be"
   }
 }

@@ -431,7 +431,9 @@ if __name__ == '__main__':
     main()
 
 # 增量更新模式（默认）
-#python migrat_cnblog.py -u careyson -g  F:\yunjian.github.io --max-pages 1
+
+#python migrat_blog.py -u careyson -g  F:\yunjian.github.io -c -gu careyson -gr careyson.github.io -c --max-pages 1
+
 
 # 全量下载模式
 #python migrat_cnblog.py -u 你的博客园用户名 -g /path/to/your/local/github/repo -f
